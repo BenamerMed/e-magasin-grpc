@@ -1,0 +1,50 @@
+syntax = "proto3";
+option java_package = "com.mba.acheteurservice.stubs";
+
+service AcheteurService{//unary model
+  rpc getAllAcheteur(GetAllAcheteurRequest) returns (GetAllAcheteurResponse);
+  rpc getOneAcheteur(GetOneAcheteurRequest) returns (GetOneAcheteurResponse);
+  rpc saveAcheteur(SaveAcheteurRequest) returns (SaveAcheteurResponse);
+  rpc updateAcheteur(UpdateAcheteurRequest) returns (UpdateAcheteurResponse);
+  rpc deleteAcheteur(DeleteAcheteurRequest) returns (DeleteAcheteurResponse);
+}
+message GetAllAcheteurRequest{}
+message GetAllAcheteurResponse{
+  repeated Acheteur acheteurs = 1;
+}
+message GetOneAcheteurRequest{
+  int64 ida = 1;
+}
+message GetOneAcheteurResponse{
+  Acheteur acheteur = 1;
+}
+message SaveAcheteurRequest{
+  AcheteurRequest acheteurRequest = 1;
+}
+message SaveAcheteurResponse{
+  Acheteur acheteur = 1;
+}
+message UpdateAcheteurRequest{
+  int64 ida = 1;
+  AcheteurRequest acheteurRequest = 2;
+}
+message UpdateAcheteurResponse{
+  Acheteur acheteur = 1;
+}
+message DeleteAcheteurRequest{
+  int64 ida = 1;
+}
+message DeleteAcheteurResponse{
+  string message = 1;
+}
+message AcheteurRequest{
+  string nom = 1;
+  string ville = 2;
+}
+message Acheteur{
+  int64 ida = 1;
+  string nom = 2;
+  string ville = 3;
+}
+
+

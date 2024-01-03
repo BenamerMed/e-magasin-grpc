@@ -1,0 +1,54 @@
+syntax = "proto3";
+option java_package = "com.mba.produitservice.stubs";
+
+service ProduitService{//unary model
+  rpc getAllProduit(GetAllProduitRequest) returns (GetAllProduitResponse);
+  rpc getOneProduit(GetOneProduitRequest) returns (GetOneProduitResponse);
+  rpc saveProduit(SaveProduitRequest) returns (SaveProduitResponse);
+  rpc updateProduit(UpdateProduitRequest) returns (UpdateProduitResponse);
+  rpc deleteProduit(DeleteProduitRequest) returns (DeleteProduitResponse);
+}
+message GetAllProduitRequest{}
+message GetAllProduitResponse{
+  repeated Produit produits = 1;
+}
+message GetOneProduitRequest{
+  int64 idp = 1;
+}
+message GetOneProduitResponse{
+  Produit produit = 1;
+}
+message SaveProduitRequest{
+  ProduitRequest produitRequest = 1;
+}
+message SaveProduitResponse{
+  Produit produit = 1;
+}
+message UpdateProduitRequest{
+  int64 idp = 1;
+  ProduitRequest produitRequest = 2;
+}
+message UpdateProduitResponse{
+  Produit produit = 1;
+}
+message DeleteProduitRequest{
+  int64 idp = 1;
+}
+message DeleteProduitResponse{
+  string message = 1;
+}
+message ProduitRequest{
+  string marque = 1;
+  string desc = 2;
+  double prix = 3;
+  int32 quantite = 4;
+}
+message Produit{
+  int64 idp = 1;
+  string marque = 2;
+  string desc = 3;
+  double prix = 4;
+  int32 quantite = 5;
+}
+
+

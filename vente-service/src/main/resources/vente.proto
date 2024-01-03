@@ -1,0 +1,67 @@
+syntax = "proto3";
+option java_package = "com.mba.venteservice.stubs";
+import "acheteur.proto";
+import "produit.proto";
+service VenteService{//unary model
+  rpc getAllVente(GetAllVenteRequest) returns (GetAllVenteResponse);
+  rpc getOneVente(GetOneVenteRequest) returns (GetOneVenteResponse);
+  rpc saveVente(SaveVenteRequest) returns (SaveVenteResponse);
+  rpc updateVente(UpdateVenteRequest) returns (UpdateVenteResponse);
+  rpc deleteVente(DeleteVenteRequest) returns (DeleteVenteResponse);
+}
+message GetAllVenteRequest{}
+message GetAllVenteResponse{
+  repeated Vente ventes = 1;
+}
+message GetOneVenteRequest{
+  int64 idv = 1;
+}
+message GetOneVenteResponse{
+  Vente vente = 1;
+}
+message SaveVenteRequest{
+  VenteRequest venteRequest = 1;
+}
+message SaveVenteResponse{
+  VenteResponse vente = 1;
+}
+message UpdateVenteRequest{
+  int64 idv = 1;
+  VenteRequest venteRequest = 2;
+}
+message UpdateVenteResponse{
+  VenteResponse vente = 1;
+}
+message DeleteVenteRequest{
+  int64 idv = 1;
+}
+message DeleteVenteResponse{
+  string message = 1;
+}
+message VenteRequest{
+  int64 ida = 1;
+  int64 idp = 2;
+  int32 quantite = 3;
+  int32 mois = 4;
+  int32 annee = 5;
+}
+message Vente {
+  int64 idv = 1;
+  int64 ida = 2;
+  int64 idp = 3;
+  int32 quantite = 4;
+  int32 mois = 5;
+  int32 annee = 6;
+  Acheteur acheteur = 7;
+  Produit produit = 8;
+}
+message VenteResponse{
+  int64 idv = 1;
+  int64 ida = 2;
+  int64 idp = 3;
+  int32 quantite = 4;
+  int32 mois = 5;
+  int32 annee = 6;
+}
+
+
