@@ -26,15 +26,22 @@ public class VenteGrpcService extends VenteServiceGrpc.VenteServiceImplBase {
     private VenteRepository venteRepository;
     @Autowired
     private VenteMapper venteMapper;
-
+    // Méthode pour récupérer les détails d'acheteur pour une vente spécifique
     private AcheteurOuterClass.Acheteur getAcheteurForVente(int ida) {
+        // ... (Appel au service AcheteurService via gRPC pour récupérer les détails de l'acheteur)
+        // Un canal gRPC pour la communication avec le service Acheteur
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 9091)
                 .usePlaintext()
                 .build();
+        // Proxy client pour le service Acheteur
         AcheteurServiceGrpc.AcheteurServiceBlockingStub acheteurStub = AcheteurServiceGrpc.newBlockingStub(channel);
+        //Création d'une requête pour récupérer les détails d'un acheteur spécifique en utilisant l'ID de l'acheteur.
         AcheteurOuterClass.GetOneAcheteurRequest requestAcheteur = AcheteurOuterClass.GetOneAcheteurRequest.newBuilder().setIda(ida).build();
+        //Envoi de la requête au service Acheteur
         AcheteurOuterClass.GetOneAcheteurResponse responseAcheteur = acheteurStub.getOneAcheteur(requestAcheteur);
+        //Extraction des détails de l'acheteur à partir de la réponse.
         AcheteurOuterClass.Acheteur acheteur = responseAcheteur.getAcheteur();
+        //Fermeture du canal gRPC une fois la communication terminée pour libérer les ressources.
         channel.shutdown();
 
         return acheteur;
@@ -63,6 +70,7 @@ public class VenteGrpcService extends VenteServiceGrpc.VenteServiceImplBase {
                     AcheteurOuterClass.Acheteur acheteur = getAcheteurForVente(vente.getIda());
                     ProduitOuterClass.Produit produit = getProduitForVente(vente.getIdp());
                     return VenteOuterClass.Vente.newBuilder()
+        // Construction de l'objet Vente gRPC avec les détails d'acheteur et de produit
                             .setIdv(vente.getIdv())
                             .setIda(vente.getIda())
                             .setIdp(vente.getIdp())
@@ -75,10 +83,11 @@ public class VenteGrpcService extends VenteServiceGrpc.VenteServiceImplBase {
                 })
                 .collect(Collectors.toList());
 
+        // Construction de la réponse contenant toutes les ventes avec les détails d'acheteur et de produit
         VenteOuterClass.GetAllVenteResponse response = VenteOuterClass.GetAllVenteResponse.newBuilder()
                 .addAllVentes(grpcVentes)
                 .build();
-
+        // Envoi de la réponse au client gRPC
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }

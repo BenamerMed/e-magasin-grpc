@@ -25,11 +25,15 @@ public class AcheteurGrpcService extends AcheteurServiceGrpc.AcheteurServiceImpl
         List<AcheteurOuterClass.Acheteur> grpcAcheteurs = acheteurs.stream()
                 .map(acheteurMapper::acheteur2grpcAcheteur)
                 .collect(Collectors.toList());
+
+        // Création de la réponse contenant tous les acheteurs convertis en gRPC
         AcheteurOuterClass.GetAllAcheteurResponse acheteursResponse = AcheteurOuterClass
                 .GetAllAcheteurResponse
                 .newBuilder()
                 .addAllAcheteurs(grpcAcheteurs)
                 .build();
+
+        // Envoi de la réponse au client gRPC
         responseObserver.onNext(acheteursResponse);
         responseObserver.onCompleted();
 
