@@ -1,13 +1,32 @@
 syntax = "proto3";
 option java_package = "com.mba.acheteurservice.stubs";
 
-service AcheteurService{//unary model
+service AcheteurService{
+  //unary model
   rpc getAllAcheteur(GetAllAcheteurRequest) returns (GetAllAcheteurResponse);
   rpc getOneAcheteur(GetOneAcheteurRequest) returns (GetOneAcheteurResponse);
   rpc saveAcheteur(SaveAcheteurRequest) returns (SaveAcheteurResponse);
   rpc updateAcheteur(UpdateAcheteurRequest) returns (UpdateAcheteurResponse);
   rpc deleteAcheteur(DeleteAcheteurRequest) returns (DeleteAcheteurResponse);
+  //server Streaming
+  rpc getAllAcheteurStream(GetAllAcheteurStreamRequest) returns (stream Acheteur);
+  // Client Streaming : Le client envoie un flux de requêtes pour sauvegarder plusieurs acheteurs
+  rpc clientStreamAcheteur(stream AcheteurRequest) returns (SaveAcheteurResponseStream);
+
+  // Bidirectionnel Streaming : Flux bidirectionnel pour sauvegarder les acheteurs un par un
+  rpc bidirectionalStreamAcheteur(stream AcheteurRequest) returns (stream AcheteurResponse);
+
 }
+message SaveAcheteurResponseStream {
+  repeated Acheteur acheteurs = 1;
+  // Autres champs si nécessaires
+}
+message AcheteurResponse {
+  Acheteur acheteur = 1;
+  // ... autres champs si nécessaire
+}
+
+message GetAllAcheteurStreamRequest {}
 message GetAllAcheteurRequest{}
 message GetAllAcheteurResponse{
   repeated Acheteur acheteurs = 1;

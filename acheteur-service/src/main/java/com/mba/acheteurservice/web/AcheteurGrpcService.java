@@ -9,6 +9,7 @@ import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,5 +89,86 @@ public class AcheteurGrpcService extends AcheteurServiceGrpc.AcheteurServiceImpl
         responseObserver.onNext(response);
         responseObserver.onCompleted();
     }
+
+    @Override
+    public void getAllAcheteurStream(AcheteurOuterClass.GetAllAcheteurStreamRequest request, StreamObserver<AcheteurOuterClass.Acheteur> responseObserver) {
+        List<Acheteur> acheteurs = acheteurRepository.findAll();
+        acheteurs.stream()
+                .map(acheteurMapper::acheteur2grpcAcheteur)
+                .forEach(responseObserver::onNext);
+
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public StreamObserver<AcheteurOuterClass.AcheteurRequest> bidirectionalStreamAcheteur(StreamObserver<AcheteurOuterClass.AcheteurResponse> responseObserver) {
+        return new StreamObserver<AcheteurOuterClass.AcheteurRequest>() {
+            @Override
+            public void onNext(AcheteurOuterClass.AcheteurRequest acheteurRequest) {
+                Acheteur acheteur = acheteurMapper.grpcAcheteur2Acheteur(acheteurRequest);
+                Acheteur savedAcheteur = acheteurRepository.save(acheteur);
+
+                AcheteurOuterClass.AcheteurResponse response = AcheteurOuterClass.AcheteurResponse
+                        .newBuilder()
+                        .setAcheteur(acheteurMapper.acheteur2grpcAcheteur(savedAcheteur))
+                        .build();
+
+                responseObserver.onNext(response);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                // Gérer les erreurs ici
+                // Par exemple : responseObserver.onError(t);
+            }
+
+            @Override
+            public void onCompleted() {
+                // Vous pouvez envoyer une réponse de confirmation ici si nécessaire
+                // Par exemple : responseObserver.onNext(confirmationResponse);
+                responseObserver.onCompleted();
+            }
+        };
+    }
+
+    @Override
+    public StreamObserver<AcheteurOuterClass.AcheteurRequest> clientStreamAcheteur(StreamObserver<AcheteurOuterClass.SaveAcheteurResponseStream> responseObserver) {
+        final List<Acheteur>[] acheteurs = new List[]{new ArrayList<>()};
+
+        return new StreamObserver<AcheteurOuterClass.AcheteurRequest>() {
+            @Override
+            public void onNext(AcheteurOuterClass.AcheteurRequest acheteurRequest) {
+                Acheteur acheteur = acheteurMapper.grpcAcheteur2Acheteur(acheteurRequest);
+                acheteurs[0].add(acheteur);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                // Gérer les erreurs ici
+                // Par exemple : responseObserver.onError(t);
+            }
+
+            @Override
+            public void onCompleted() {
+                // Enregistrement des acheteurs une fois le flux terminé
+                acheteurs[0] = acheteurRepository.saveAll(acheteurs[0]);
+
+                // Conversion en format gRPC
+                List<AcheteurOuterClass.Acheteur> grpcAcheteurs = acheteurs[0].stream()
+                        .map(acheteurMapper::acheteur2grpcAcheteur)
+                        .collect(Collectors.toList());
+
+                // Création de la réponse
+                AcheteurOuterClass.SaveAcheteurResponseStream response = AcheteurOuterClass.SaveAcheteurResponseStream.newBuilder()
+                        .addAllAcheteurs(grpcAcheteurs)
+                        .build();
+
+                // Envoi de la réponse
+                responseObserver.onNext(response);
+                responseObserver.onCompleted();
+            }
+        };
+    }
+
 
 }
